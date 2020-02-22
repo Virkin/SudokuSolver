@@ -127,6 +127,7 @@ namespace SudokuSolver
                     gridSolution[var['i'], var['j']] = value;
 
                     PrintGrid();
+
                     int result = RecursiveBacktracking();
 
                     if(result==0){ return result; }
