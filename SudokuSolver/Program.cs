@@ -10,6 +10,9 @@ namespace SudokuSolver
     {
         static void Main(string[] args)
         {
+            int[,] grid = new int[9,9];
+
+            Solver solve = new Solver(grid);
         }
     }
 }
