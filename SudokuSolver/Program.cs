@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace SudokuSolver
 {
@@ -10,6 +10,8 @@ namespace SudokuSolver
     {
         static void Main(string[] args)
         {
+            Reader file = new Reader();
+            file.Read();
         }
     }
 }
