@@ -16,6 +16,9 @@ namespace SudokuSolver
 
             Solver solve = new Solver(file.GetGrid());
 
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadKey();
+
         }
     }
 }
