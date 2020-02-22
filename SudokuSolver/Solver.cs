@@ -69,8 +69,9 @@ namespace SudokuSolver
             return variable;
         }
 
-        public bool CheckLines(Dictionary<char, int> var, int val)
+        public bool CheckConstraints(Dictionary<char, int> var, int val)
         {
+            // Check vertical line
             for(int i=0; i<gridSize; i++)
             {
                 if(gridSolution[i,var['j']] == val)
@@ -79,11 +80,28 @@ namespace SudokuSolver
                 }
             }
 
+            // Check horizontal line
             for (int j = 0; j < gridSize; j++)
             {
                 if (gridSolution[var['i'], j] == val)
                 {
                     return false;
+                }
+            }
+
+            // Check box
+            int boxSize = (int) Math.Sqrt(gridSize);
+            int boxi = var['i'] - var['i'] % boxSize;
+            int boxj = var['j'] - var['j'] % boxSize;
+
+            for(int i=boxi;i<boxi+boxSize;i++)
+            {
+                for(int j=boxj; j<boxj+boxSize; j++)
+                {
+                    if(gridSolution[i,j] == val)
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -103,7 +121,7 @@ namespace SudokuSolver
 
             foreach(int value in values)
             {
-                if(CheckLines(var,value) == true)
+                if(CheckConstraints(var,value) == true)
                 {
                     gridSolution[var['i'], var['j']] = value;
 
