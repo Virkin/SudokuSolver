@@ -150,6 +150,7 @@ namespace SudokuSolver
                     {
                         Console.Write('-');
                     }
+
                     Console.WriteLine();
                 }
 
@@ -171,7 +172,6 @@ namespace SudokuSolver
                 }
 
                 Console.WriteLine();
-
                 
             }
 
