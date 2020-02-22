@@ -11,7 +11,11 @@ namespace SudokuSolver
         static void Main(string[] args)
         {
             Reader file = new Reader();
+            
             file.Read();
+
+            Solver solve = new Solver(file.GetGrid());
+
         }
     }
 }

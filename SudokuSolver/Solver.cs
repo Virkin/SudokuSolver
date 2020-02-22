@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SudokuSolver
@@ -125,6 +126,7 @@ namespace SudokuSolver
                 {
                     gridSolution[var['i'], var['j']] = value;
 
+                    PrintGrid();
                     int result = RecursiveBacktracking();
 
                     if(result==0){ return result; }
@@ -138,16 +140,42 @@ namespace SudokuSolver
 
         public void PrintGrid()
         {
-            Console.Clear();
+            Console.SetCursorPosition(0, 0);
 
             for(int i=0; i<gridSize; i++)
             {
+                if (i % Math.Sqrt(gridSize) == 0 && i != 0)
+                {
+                    for (int k = 0; k < gridSize + 2; k++)
+                    {
+                        Console.Write('-');
+                    }
+                    Console.WriteLine();
+                }
+
                 for (int j=0; j < gridSize; j++)
                 {
-                    Console.Write(gridSolution[i, j]);
+                    if (j % Math.Sqrt(gridSize) == 0 && j!=0)
+                    {
+                        Console.Write('|');
+                    }
+
+                    if (gridSolution[i,j] > 0)
+                    {
+                        Console.Write(gridSolution[i, j]);
+                    }
+                    else
+                    {
+                        Console.Write(' ');
+                    }
                 }
+
                 Console.WriteLine();
+
+                
             }
+
+            Thread.Sleep(10);
         }
     }
 }

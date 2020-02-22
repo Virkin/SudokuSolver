@@ -5,7 +5,7 @@ namespace SudokuSolver
     class Reader
     {
         private string path;
-        private char[,] sudoku2d = new char[9, 9];
+        private int[,] sudoku2d = new int[9, 9];
 
         public Reader()
         {
@@ -25,33 +25,46 @@ namespace SudokuSolver
             return file;
         }
 
+        public int[,] GetGrid()
+        {
+            return sudoku2d;
+        }
+
         public void fillSudoku2d()
         {
             string[] lines = System.IO.File.ReadAllLines(this.path);
             for (int i=0; i<lines.Length; i++)
             {
                 string line = lines[i];
-                Console.WriteLine(line);
+                //Console.WriteLine(line);
                 for (int j=0; j<lines[i].Length; j++)
                 {
                     char square = line[j];
-                    Console.WriteLine(square);
-                    Console.WriteLine(i+":"+j);
-                    this.sudoku2d[i,j] = square;
+                    //Console.WriteLine(square);
+                    //Console.WriteLine(i+":"+j);
+                    this.sudoku2d[i,j] = square - '0';
                 }
             }
         }
 
         public void Read()
         {
-            Console.WriteLine(getSudoku());
-            Console.WriteLine();
+            //Console.WriteLine(getSudoku());
+            //Console.WriteLine();
             fillSudoku2d();
-            Console.WriteLine();
+            //Console.WriteLine();
             // this.sudoku2d[ligne,colonne];
-            Console.WriteLine(this.sudoku2d[1,2]);
-            Console.WriteLine("Press any key to exit.");
-            Console.ReadKey();
+            /*for(int i=0; i<9; i++)
+            {
+                for(int j=0;j<9;j++)
+                {
+                    Console.Write(this.sudoku2d[i, j]);
+                }
+                Console.WriteLine();
+            }*/
+           
+            //Console.WriteLine("Press any key to exit.");
+            //Console.ReadKey();
         }
     }
 }
