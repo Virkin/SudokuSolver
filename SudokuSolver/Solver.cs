@@ -175,8 +175,6 @@ namespace SudokuSolver
                 Console.WriteLine();
                 
             }
-
-            Thread.Sleep(10);
         }
     }
 }
