@@ -227,7 +227,7 @@ namespace SudokuSolver
             {
                 orderedValues.Add(item.Key);
             }
-          
+
             return orderedValues;
         }
 
@@ -293,8 +293,6 @@ namespace SudokuSolver
             {
                 if (CheckConstraints(var, value) == true)
                 {
-                    //Console.WriteLine("var:{0} | value:{1}", var, value);
-
                     List<int> coordIj = CoordToIj(var);
 
                     int i = coordIj[0];
@@ -302,7 +300,12 @@ namespace SudokuSolver
 
                     gridSolution[i, j] = value;
 
-                    //PrintGrid();
+                    PrintGrid();
+
+                    //Console.WriteLine("var:{0} | value:{1}", var, value);
+
+                    //Thread.Sleep(20000);
+
                     nbStep++;
 
                     int result = RecursiveBacktracking();

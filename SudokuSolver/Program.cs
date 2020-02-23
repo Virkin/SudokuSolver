@@ -19,6 +19,8 @@ namespace SudokuSolver
 
             foreach (int[,] sudoku in reader.getListSudoku())
             {
+                Console.Clear();
+                
                 Console.WriteLine("New Sudoku");
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
