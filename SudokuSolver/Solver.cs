@@ -14,7 +14,7 @@ namespace SudokuSolver
 
         private Dictionary<string, List<string>> constraints;
 
-        private List<int> values;
+        private List<int> valuesEnum;
         private int gridSize;
 
         private int nbStep = 0;
@@ -24,9 +24,9 @@ namespace SudokuSolver
             gridProblem = grid;
             gridSize = (int) Math.Sqrt(gridProblem.Length);
 
-            values = new List<int>();
+            valuesEnum = new List<int>();
 
-            for(int i=1; i<=gridSize; i++){values.Add(i);}
+            for(int i=1; i<=gridSize; i++){valuesEnum.Add(i);}
 
             gridSolution = gridProblem;
 
@@ -54,27 +54,20 @@ namespace SudokuSolver
             return true;
         }
 
-        public Dictionary<char,int> SelectUnassignedVariable()
+        public string SelectUnassignedVariable()
         {
-            Dictionary<char, int> variable = new Dictionary<char, int>();
-            
             for (int i = 0; i < gridSize; i++)
             {
                 for (int j = 0; j < gridSize; j++)
                 {
                     if (gridSolution[i, j] == 0)
                     {
-                        variable.Add('i', i);
-                        variable.Add('j', j);
-                        return variable;
+                        return IjToCoord(i, j);
                     }
                 }
             }
 
-            variable.Add('i', -1);
-            variable.Add('j', -1);
-
-            return variable;
+            return null;
         }
 
         public void GenerateConstraints()
@@ -90,13 +83,11 @@ namespace SudokuSolver
                     {
                         if(k != i)
                         {
-                            char[] coord = { (char)(k + 'A'), (char)(j + '0') };
-                            constrainElem.Add( new string(coord) );
+                            constrainElem.Add(IjToCoord(k, j));
                         }
                         if(k != j)
                         {
-                            char[] coord = { (char)(i + 'A'), (char)(k + '0') };
-                            constrainElem.Add (new string(coord) );
+                            constrainElem.Add(IjToCoord(i, k));
                         }
                     }
 
@@ -111,32 +102,25 @@ namespace SudokuSolver
                         {
                             if(k!=i || l!=j)
                             {
-                                char[] coord = { (char)(k + 'A'), (char)(l + '0') };
-                                constrainElem.Add(new string(coord));
+                                constrainElem.Add(IjToCoord(k, l));
                             }
                         }
                     }
 
-                    char[] coordMain = { (char)(i + 'A'), (char)(j + '0') };
-                    constraints.Add(new string(coordMain), constrainElem);
+                    constraints.Add(IjToCoord(i, j), constrainElem);
                 }
             }
         }
 
-        public bool CheckConstraints(Dictionary<char, int> var, int val)
+        public bool CheckConstraints(string var, int val)
         {
-            char[] coord = { (char)(var['i'] + 'A'), (char)(var['j'] + '0') };
-
-            string coordStr = new string(coord);
-
-            List<string> constrainElem = constraints[coordStr];
+            List<string> constrainElem = constraints[var];
 
             foreach(string elem in constrainElem)
             {
-                int i = elem[0] - 'A';
-                int j = elem[1] - '0';
+                List<int> coordIj = CoordToIj(elem);
 
-                if(gridSolution[i,j] == val)
+                if (gridSolution[coordIj[0],coordIj[1]] == val)
                 {
                     return false;
                 }
@@ -145,16 +129,14 @@ namespace SudokuSolver
             return true;
         }
 
-        public Dictionary<char, int> MRV()
+        public string MRV()
         {
-            Dictionary<char, int> variable = new Dictionary<char, int>();
-
             int minValues = gridSize+1;
 
             List<int> possibleValues;
 
-            int vari = -1;
-            int varj = -1;
+            int vari = 0;
+            int varj = 0;
 
             for (int i = 0; i < gridSize; i++)
             {
@@ -162,22 +144,19 @@ namespace SudokuSolver
                 {
                     if (gridSolution[i, j] == 0)
                     {
-                        possibleValues = new List<int>(values);
+                        possibleValues = new List<int>(valuesEnum);
 
-                        char[] coord = { (char)(i + 'A'), (char)(j + '0') };
-
-                        string coordStr = new string(coord);
+                        string coordStr = IjToCoord(i, j);
 
                         List<string> constrainElem = constraints[coordStr];
 
                         foreach (string elem in constrainElem)
                         {
-                            int elemi = elem[0] - 'A';
-                            int elemj = elem[1] - '0';
+                            List<int> coordIj = CoordToIj(elem);
 
-                            if (possibleValues.Contains(gridSolution[elemi, elemj]) == true)
+                            if (possibleValues.Contains(gridSolution[coordIj[0], coordIj[1]]) == true)
                             {
-                                possibleValues.Remove(gridSolution[elemi, elemj]);
+                                possibleValues.Remove(gridSolution[coordIj[0], coordIj[1]]);
                             }
                         }
 
@@ -191,16 +170,69 @@ namespace SudokuSolver
                 }
             }
 
-            variable.Add('i', vari);
-            variable.Add('j', varj);
-
-            return variable;
+            return IjToCoord(vari, varj);
         }
 
-        public Dictionary<char, int> DegreeHeuristic()
+        public List<int> GetPossibleValues(string var)
         {
-            Dictionary<char, int> variable = new Dictionary<char, int>();
+            List<int> possibleValues = new List<int>();
 
+            foreach(int value in valuesEnum)
+            {
+                if (CheckConstraints(var, value) == true)
+                {
+                    possibleValues.Add(value);
+                }
+            }
+
+            return possibleValues;
+        }
+
+        public List<int> LCV(string var)
+        {
+            List<int> varValues = new List<int>(valuesEnum);
+
+            List<string> constrainElem = constraints[var];
+
+            Dictionary<int, int> reduceScoreRegister = new Dictionary<int, int>();
+
+            List<int> constrainValues;
+
+            int reduceScore;
+
+            foreach(int value in varValues)
+            {
+                reduceScore = 0;
+
+                foreach (string elem in constrainElem)
+                {
+                    constrainValues = GetPossibleValues(elem);
+
+                    foreach(int cvalue in constrainValues)
+                    { 
+                        if(value==cvalue)
+                        {
+                            reduceScore++;
+                            break;
+                        }
+                    }
+                }
+
+                reduceScoreRegister.Add(value, reduceScore);
+            }
+
+            List<int> orderedValues = new List<int>();
+
+            foreach (KeyValuePair<int, int> item in reduceScoreRegister.OrderBy(key => key.Value))
+            {
+                orderedValues.Add(item.Key);
+            }
+          
+            return orderedValues;
+        }
+
+        public string DegreeHeuristic()
+        {
             int nbConstraints;
             int maxNbConstraints = -1;
             int vari = -1;
@@ -214,18 +246,15 @@ namespace SudokuSolver
                     {
                         nbConstraints = 0;
 
-                        char[] coord = { (char)(i + 'A'), (char)(j + '0') };
-
-                        string coordStr = new string(coord);
+                        string coordStr = IjToCoord(i,j);
 
                         List<string> constrainElem = constraints[coordStr];
 
                         foreach (string elem in constrainElem)
                         {
-                            int elemi = elem[0] - 'A';
-                            int elemj = elem[1] - '0';
+                            List<int> coordIj = CoordToIj(elem);
 
-                            if (gridSolution[elemi, elemj] == 0)
+                            if (gridSolution[coordIj[0], coordIj[1]] == 0)
                             {
                                 nbConstraints++;
                             }
@@ -241,10 +270,7 @@ namespace SudokuSolver
                 }               
             }
 
-            variable.Add('i', vari);
-            variable.Add('j', varj);
-
-            return variable;
+            return IjToCoord(vari, varj);
         }
 
         public void Backtracking()
@@ -256,24 +282,34 @@ namespace SudokuSolver
         {
             if(AssigmentComplete() == true) { return 0; }
 
-            //Dictionary<char, int> var = SelectUnassignedVariable();
-            //Dictionary<char, int> var = MRV();
-            Dictionary<char, int> var = DegreeHeuristic();
+            //string var = SelectUnassignedVariable();
+            //string var = MRV();
+            string var = DegreeHeuristic();
+
+            //List<int> values = new List<int>(valuesEnum);
+            List<int> values = LCV(var);
 
             foreach (int value in values)
             {
-                if(CheckConstraints(var,value) == true)
+                if (CheckConstraints(var, value) == true)
                 {
-                    gridSolution[var['i'], var['j']] = value;
+                    //Console.WriteLine("var:{0} | value:{1}", var, value);
+
+                    List<int> coordIj = CoordToIj(var);
+
+                    int i = coordIj[0];
+                    int j = coordIj[1];
+
+                    gridSolution[i, j] = value;
 
                     //PrintGrid();
                     nbStep++;
 
                     int result = RecursiveBacktracking();
 
-                    if(result==0){ return result; }
+                    if (result == 0) { return result; }
 
-                    gridSolution[var['i'], var['j']] = 0;
+                    gridSolution[i, j] = 0;
                 }
             }
 
@@ -319,6 +355,23 @@ namespace SudokuSolver
 
             Console.WriteLine();
             Console.WriteLine("Num of steps : {0}", nbStep);
+        }
+
+        public string IjToCoord(int i, int j)
+        {
+            char[] coord = { (char)(i + 'A'), (char)(j + '0') };
+
+            return new string(coord);
+        }
+
+        public List<int> CoordToIj(string coord)
+        {
+            List<int> ij = new List<int>();
+            
+            ij.Add(coord[0] - 'A');
+            ij.Add(coord[1] - '0');
+
+            return ij;
         }
     }
 }
