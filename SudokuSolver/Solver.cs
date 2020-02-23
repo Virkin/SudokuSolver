@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Configuration;
+
 
 namespace SudokuSolver
 {
@@ -282,9 +284,9 @@ namespace SudokuSolver
         {
             if(AssigmentComplete() == true) { return 0; }
 
-            //string var = SelectUnassignedVariable();
+            string var = SelectUnassignedVariable();
             //string var = MRV();
-            string var = DegreeHeuristic();
+            //string var = DegreeHeuristic();
 
             //List<int> values = new List<int>(valuesEnum);
             List<int> values = LCV(var);
@@ -300,7 +302,9 @@ namespace SudokuSolver
 
                     gridSolution[i, j] = value;
 
-                    PrintGrid();
+                    string printGridConf = ConfigurationManager.AppSettings.Get("PrintGrid");
+                    if (printGridConf == "true")
+                        PrintGrid();
 
                     //Console.WriteLine("var:{0} | value:{1}", var, value);
 
