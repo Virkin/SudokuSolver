@@ -53,6 +53,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Sudoku1.txt" />
+    <Content Include="Sudoku2.txt" />
+    <Content Include="Sudoku3.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

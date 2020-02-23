@@ -1,70 +1,81 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace SudokuSolver
 {
     class Reader
     {
-        private string path;
-        private int[,] sudoku2d = new int[9, 9];
+        private List<string> listSudokuPath = new List<string>();
+        private List<int[,]> listSudoku2d = new List<int[,]>();
 
         public Reader()
         {
-            filePath("Sudoku1.txt");
+            ListSudoku();
         }
 
-        public void filePath(string filename)
+        public List<string> ListSudoku()
         {
             string workingDirectory = Environment.CurrentDirectory;
-            string projectDirectory = System.IO.Directory.GetParent(workingDirectory).Parent.FullName;
-            this.path = System.IO.Path.Combine(projectDirectory, filename);
+            string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
+            string[] fileEntries = Directory.GetFiles(projectDirectory, "*.txt");
+            foreach (string filePath in fileEntries)
+            {
+                listSudokuPath.Add(filePath);
+            }
+            return listSudokuPath;
         }
 
-        public String getSudoku()
+        public List<string> getListSudokuPath()
         {
-            string file = System.IO.File.ReadAllText(this.path);
+            return listSudokuPath;
+        }
+
+        public string getSudokuPath(string path)
+        {
+            return listSudokuPath.Find(element => element.Contains(path));
+        }
+
+        public String getSudoku(string path)
+        {
+            string file = File.ReadAllText(path);
             return file;
         }
 
-        public int[,] GetGrid()
+        public int getSize(string path)
         {
-            return sudoku2d;
+            string[] lines = File.ReadAllLines(path);
+            return lines.Length;
+        }
+
+        public List<int[,]> getListSudoku()
+        {
+            return listSudoku2d;
         }
 
         public void fillSudoku2d()
         {
-            string[] lines = System.IO.File.ReadAllLines(this.path);
-            for (int i=0; i<lines.Length; i++)
+            foreach (string path in listSudokuPath)
             {
-                string line = lines[i];
-                //Console.WriteLine(line);
-                for (int j=0; j<lines[i].Length; j++)
+                int size = getSize(path);
+                int[,] sudoku2d = new int[size, size];
+                string[] lines = File.ReadAllLines(path);
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    char square = line[j];
-                    //Console.WriteLine(square);
-                    //Console.WriteLine(i+":"+j);
-                    this.sudoku2d[i,j] = square - '0';
+                    string line = lines[i];
+                    for (int j = 0; j < lines[i].Length; j++)
+                    {
+                        char square = line[j];
+                        sudoku2d[i, j] = square - '0';
+                    }
                 }
+                listSudoku2d.Add(sudoku2d);
             }
         }
 
         public void Read()
         {
-            //Console.WriteLine(getSudoku());
-            //Console.WriteLine();
             fillSudoku2d();
-            //Console.WriteLine();
-            // this.sudoku2d[ligne,colonne];
-            /*for(int i=0; i<9; i++)
-            {
-                for(int j=0;j<9;j++)
-                {
-                    Console.Write(this.sudoku2d[i, j]);
-                }
-                Console.WriteLine();
-            }*/
-           
-            //Console.WriteLine("Press any key to exit.");
-            //Console.ReadKey();
         }
     }
 }
