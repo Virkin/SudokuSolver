@@ -145,6 +145,58 @@ namespace SudokuSolver
             return true;
         }
 
+        public Dictionary<char, int> MRV()
+        {
+            Dictionary<char, int> variable = new Dictionary<char, int>();
+
+            int minValues = gridSize+1;
+
+            List<int> possibleValues;
+
+            int vari = -1;
+            int varj = -1;
+
+            for (int i = 0; i < gridSize; i++)
+            {
+                for (int j = 0; j < gridSize; j++)
+                {
+                    if (gridSolution[i, j] == 0)
+                    {
+                        possibleValues = new List<int>(values);
+
+                        char[] coord = { (char)(i + 'A'), (char)(j + '0') };
+
+                        string coordStr = new string(coord);
+
+                        List<string> constrainElem = constraints[coordStr];
+
+                        foreach (string elem in constrainElem)
+                        {
+                            int elemi = elem[0] - 'A';
+                            int elemj = elem[1] - '0';
+
+                            if (possibleValues.Contains(gridSolution[elemi, elemj]) == true)
+                            {
+                                possibleValues.Remove(gridSolution[elemi, elemj]);
+                            }
+                        }
+
+                        if (possibleValues.Count < minValues)
+                        {
+                            minValues = possibleValues.Count;
+                            vari = i;
+                            varj = j;
+                        }
+                    }
+                }
+            }
+
+            variable.Add('i', vari);
+            variable.Add('j', varj);
+
+            return variable;
+        }
+
         public Dictionary<char, int> DegreeHeuristic()
         {
             Dictionary<char, int> variable = new Dictionary<char, int>();
@@ -204,8 +256,9 @@ namespace SudokuSolver
         {
             if(AssigmentComplete() == true) { return 0; }
 
-            Dictionary<char, int> var = SelectUnassignedVariable();
-            //Dictionary<char, int> var = DegreeHeuristic();
+            //Dictionary<char, int> var = SelectUnassignedVariable();
+            //Dictionary<char, int> var = MRV();
+            Dictionary<char, int> var = DegreeHeuristic();
 
             foreach (int value in values)
             {
