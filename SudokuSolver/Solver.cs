@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Collections;
 
 
 namespace SudokuSolver
@@ -14,6 +15,7 @@ namespace SudokuSolver
         private int[,] gridProblem;
         private int[,] gridSolution;
 
+        private Dictionary<string, List<int>> domains;
         private Dictionary<string, List<string>> constraints;
 
         private List<int> valuesEnum;
@@ -32,11 +34,28 @@ namespace SudokuSolver
 
             gridSolution = gridProblem;
 
+            domains = new Dictionary<string, List<int>>();
             constraints = new Dictionary<string, List<string>>();
+
+            GenerateDomains();
             GenerateConstraints();
 
+            AC3();
+            
             Backtracking();
+            
             PrintGrid();
+
+            /*foreach(KeyValuePair<string, List<int>> item in domains)
+            {
+                Console.Write("({0}) : [", item.Key);
+                foreach(int val in item.Value)
+                {
+                    Console.Write("{0} ,", val);
+                }
+                Console.Write("]");
+                Console.WriteLine();
+            }*/
 
         }
 
@@ -70,6 +89,24 @@ namespace SudokuSolver
             }
 
             return null;
+        }
+
+        public void GenerateDomains()
+        {
+            for (int i = 0; i < gridSize; i++)
+            {
+                for (int j = 0; j < gridSize; j++)
+                {
+                    if(gridProblem[i,j] == 0)
+                    {
+                        domains.Add(IjToCoord(i, j), new List<int>(valuesEnum));
+                    }
+                    else
+                    {
+                        domains.Add(IjToCoord(i, j), new List<int> { gridProblem[i, j] });
+                    }
+                }
+            }
         }
 
         public void GenerateConstraints()
@@ -192,7 +229,7 @@ namespace SudokuSolver
 
         public List<int> LCV(string var)
         {
-            List<int> varValues = new List<int>(valuesEnum);
+            List<int> varValues = new List<int>(domains[var]);
 
             List<string> constrainElem = constraints[var];
 
@@ -275,6 +312,71 @@ namespace SudokuSolver
             return IjToCoord(vari, varj);
         }
 
+        public Queue<(string, string)> GenerateArcs()
+        {
+            Queue<(string, string)> arcs = new Queue<(string, string)>();
+
+            foreach (KeyValuePair<string, List<string>> item in constraints)
+            {
+                string var = item.Key;
+
+                foreach(string cvar in item.Value)
+                {
+                    arcs.Enqueue((var, cvar));
+                }
+            }
+
+            return arcs;
+        }
+
+        public void AC3()
+        {
+            Queue<(string, string)> arcsQueue = GenerateArcs();
+
+            while(arcsQueue.Count > 0)
+            {
+                (string, string) arc = arcsQueue.Dequeue();
+                string xi = arc.Item1;
+                string xj = arc.Item2;
+
+                if(RemoveInconsistentValues(xi,xj))
+                {
+                    foreach(string xk in constraints[xi])
+                    {
+                        arcsQueue.Enqueue((xk, xi));
+                    }
+                }
+            }
+        }
+
+        public bool RemoveInconsistentValues(string xi, string xj)
+        {
+            bool removed = false;
+
+            foreach(int x in domains[xi].ToList())
+            {
+                if(CheckInconsistent(x,domains[xj]))
+                {
+                    domains[xi].Remove(x);
+                    removed = true;
+                }
+            }
+
+            return removed;
+        }
+
+        public bool CheckInconsistent(int x, List<int> ys)
+        {
+            foreach(int y in ys)
+            {
+                if(y!=x)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public void Backtracking()
         {
             int result = RecursiveBacktracking();
@@ -284,12 +386,14 @@ namespace SudokuSolver
         {
             if(AssigmentComplete() == true) { return 0; }
 
+            //Dictionary<string, List<int>> oldDomains = new Dictionary<string, List<int>>(domains);
+
             string var = SelectUnassignedVariable();
             //string var = MRV();
             //string var = DegreeHeuristic();
 
-            //List<int> values = new List<int>(valuesEnum);
-            List<int> values = LCV(var);
+            List<int> values = new List<int>(domains[var]);
+            //List<int> values = LCV(var);
 
             foreach (int value in values)
             {
@@ -301,6 +405,18 @@ namespace SudokuSolver
                     int j = coordIj[1];
 
                     gridSolution[i, j] = value;
+
+                    /*List<int> domain = new List<int>(domains[var]);
+
+                    foreach(int val in domain)
+                    {
+                        if(val!=value)
+                        {
+                            domains[var].Remove(val);
+                        }
+                    }
+
+                    AC3();*/
 
                     string printGridConf = ConfigurationManager.AppSettings.Get("PrintGrid");
                     if (printGridConf == "true")
@@ -317,6 +433,10 @@ namespace SudokuSolver
                     if (result == 0) { return result; }
 
                     gridSolution[i, j] = 0;
+
+                    /*domains = new Dictionary<string, List<int>>(oldDomains);
+
+                    AC3();*/
                 }
             }
 
