@@ -312,6 +312,19 @@ namespace SudokuSolver
             return IjToCoord(vari, varj);
         }
 
+        public Dictionary<string, List<int>> CopyDomains(Dictionary<string, List<int>> oldDomains)
+        {
+            Dictionary<string, List<int>> newDomains = new Dictionary<string, List<int>>();
+
+            foreach (KeyValuePair<string, List<int>> item in oldDomains)
+            {
+                List<int> values = new List<int>(item.Value);
+                newDomains.Add(item.Key,values);
+            }
+
+            return newDomains;
+        }
+
         public Queue<(string, string)> GenerateArcs()
         {
             Queue<(string, string)> arcs = new Queue<(string, string)>();
@@ -386,11 +399,11 @@ namespace SudokuSolver
         {
             if(AssigmentComplete() == true) { return 0; }
 
-            //Dictionary<string, List<int>> oldDomains = new Dictionary<string, List<int>>(domains);
+            Dictionary<string, List<int>> oldDomains = CopyDomains(domains);
 
-            string var = SelectUnassignedVariable();
+            //string var = SelectUnassignedVariable();
             //string var = MRV();
-            //string var = DegreeHeuristic();
+            string var = DegreeHeuristic();
 
             List<int> values = new List<int>(domains[var]);
             //List<int> values = LCV(var);
@@ -406,7 +419,7 @@ namespace SudokuSolver
 
                     gridSolution[i, j] = value;
 
-                    /*List<int> domain = new List<int>(domains[var]);
+                    List<int> domain = new List<int>(domains[var]);
 
                     foreach(int val in domain)
                     {
@@ -416,7 +429,7 @@ namespace SudokuSolver
                         }
                     }
 
-                    AC3();*/
+                    AC3();
 
                     string printGridConf = ConfigurationManager.AppSettings.Get("PrintGrid");
                     if (printGridConf == "true")
@@ -434,9 +447,9 @@ namespace SudokuSolver
 
                     gridSolution[i, j] = 0;
 
-                    /*domains = new Dictionary<string, List<int>>(oldDomains);
+                    domains = CopyDomains(oldDomains);
 
-                    AC3();*/
+                    AC3();
                 }
             }
 
