@@ -15,9 +15,11 @@ namespace SudokuSolver
             
             reader.Read();
 
-            Solver solve;
+            //Solver solve;
+            Generator generate;
+            generate = new Generator();
 
-            foreach (int[,] sudoku in reader.getListSudoku())
+            /*foreach (int[,] sudoku in reader.getListSudoku())
             {
                 Console.Clear();
                 
@@ -32,7 +34,7 @@ namespace SudokuSolver
                 Console.WriteLine("Time to solve (hh:mm:ss) : {0}", elapsed_time);
                 Console.WriteLine("Press any key to solve next sudoku");
                 Console.ReadKey();
-            }
+            }*/
 
             Console.WriteLine("Press any key to exit.");
             Console.ReadKey();
