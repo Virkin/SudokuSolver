@@ -15,7 +15,7 @@ namespace SudokuSolver
             
             reader.Read();
 
-            //Solver solve;
+            Solver solver;
             Generator generate;
             generate = new Generator();
 
@@ -27,7 +27,19 @@ namespace SudokuSolver
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                solve = new Solver(sudoku);
+                solver = new Solver(sudoku);
+                int res = solver.Run();
+
+                Console.WriteLine();
+
+                if (res==0)
+                {
+                    Console.WriteLine("Solve !");
+                }
+                else
+                {
+                    Console.WriteLine("Can't be solve ! Please check if your grid is correct.");
+                }
 
                 stopwatch.Stop();
                 TimeSpan elapsed_time = stopwatch.Elapsed;

@@ -10,53 +10,27 @@ using System.Collections;
 
 namespace SudokuSolver
 {
-    class Solver
+    class Solver : Sudoku
     {
-        private int[,] gridProblem;
-        private int[,] gridSolution;
-
         private Dictionary<string, List<int>> domains;
-        private Dictionary<string, List<string>> constraints;
-
-        private List<int> valuesEnum;
-        private int gridSize;
 
         private int nbStep = 0;
 
-        public Solver(int[,] grid)
+        public Solver(int[,] newGrid) : base(newGrid){}
+
+        public int Run()
         {
-            gridProblem = grid;
-            gridSize = (int) Math.Sqrt(gridProblem.Length);
-
-            valuesEnum = new List<int>();
-
-            for(int i=1; i<=gridSize; i++){valuesEnum.Add(i);}
-
-            gridSolution = gridProblem;
-
             domains = new Dictionary<string, List<int>>();
-            constraints = new Dictionary<string, List<string>>();
 
             GenerateDomains();
-            GenerateConstraints();
 
             AC3();
-            
-            Backtracking();
-            
-            PrintGrid();
 
-            /*foreach(KeyValuePair<string, List<int>> item in domains)
-            {
-                Console.Write("({0}) : [", item.Key);
-                foreach(int val in item.Value)
-                {
-                    Console.Write("{0} ,", val);
-                }
-                Console.Write("]");
-                Console.WriteLine();
-            }*/
+            int res = Backtracking();
 
+            //PrintGridEvolution();
+
+            return res;
         }
 
         public bool AssigmentComplete()
@@ -65,7 +39,7 @@ namespace SudokuSolver
             {
                 for(int j=0; j<gridSize; j++)
                 {
-                    if(gridSolution[i,j] == 0)
+                    if(grid[i,j] == 0)
                     {
                         return false;
                     }
@@ -81,7 +55,7 @@ namespace SudokuSolver
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    if (gridSolution[i, j] == 0)
+                    if (grid[i, j] == 0)
                     {
                         return IjToCoord(i, j);
                     }
@@ -97,56 +71,14 @@ namespace SudokuSolver
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    if(gridProblem[i,j] == 0)
+                    if(grid[i,j] == 0)
                     {
                         domains.Add(IjToCoord(i, j), new List<int>(valuesEnum));
                     }
                     else
                     {
-                        domains.Add(IjToCoord(i, j), new List<int> { gridProblem[i, j] });
+                        domains.Add(IjToCoord(i, j), new List<int> { grid[i, j] });
                     }
-                }
-            }
-        }
-
-        public void GenerateConstraints()
-        {
-            for(int i = 0; i<gridSize; i++)
-            {
-                for(int j=0; j<gridSize; j++)
-                {
-                    List<string> constrainElem = new List<string>();
-                    
-                    // Check line
-                    for (int k = 0; k < gridSize; k++)
-                    {
-                        if(k != i)
-                        {
-                            constrainElem.Add(IjToCoord(k, j));
-                        }
-                        if(k != j)
-                        {
-                            constrainElem.Add(IjToCoord(i, k));
-                        }
-                    }
-
-                    // Check box
-                    int boxSize = (int)Math.Sqrt(gridSize);
-                    int boxi = i - i % boxSize;
-                    int boxj = j - j % boxSize;
-
-                    for (int k = boxi; k < boxi + boxSize; k++)
-                    {
-                        for (int l = boxj; l < boxj + boxSize; l++)
-                        {
-                            if(k!=i || l!=j)
-                            {
-                                constrainElem.Add(IjToCoord(k, l));
-                            }
-                        }
-                    }
-
-                    constraints.Add(IjToCoord(i, j), constrainElem);
                 }
             }
         }
@@ -159,7 +91,7 @@ namespace SudokuSolver
             {
                 List<int> coordIj = CoordToIj(elem);
 
-                if (gridSolution[coordIj[0],coordIj[1]] == val)
+                if (grid[coordIj[0],coordIj[1]] == val)
                 {
                     return false;
                 }
@@ -181,7 +113,7 @@ namespace SudokuSolver
             {
                 for (int j = 0; j < gridSize; j++)
                 {
-                    if (gridSolution[i, j] == 0)
+                    if (grid[i, j] == 0)
                     {
                         possibleValues = new List<int>(valuesEnum);
 
@@ -193,9 +125,9 @@ namespace SudokuSolver
                         {
                             List<int> coordIj = CoordToIj(elem);
 
-                            if (possibleValues.Contains(gridSolution[coordIj[0], coordIj[1]]) == true)
+                            if (possibleValues.Contains(grid[coordIj[0], coordIj[1]]) == true)
                             {
-                                possibleValues.Remove(gridSolution[coordIj[0], coordIj[1]]);
+                                possibleValues.Remove(grid[coordIj[0], coordIj[1]]);
                             }
                         }
 
@@ -281,7 +213,7 @@ namespace SudokuSolver
             {
                 for(int j=0; j<gridSize; j++)
                 {
-                    if(gridSolution[i,j] == 0)
+                    if(grid[i,j] == 0)
                     {
                         nbConstraints = 0;
 
@@ -293,7 +225,7 @@ namespace SudokuSolver
                         {
                             List<int> coordIj = CoordToIj(elem);
 
-                            if (gridSolution[coordIj[0], coordIj[1]] == 0)
+                            if (grid[coordIj[0], coordIj[1]] == 0)
                             {
                                 nbConstraints++;
                             }
@@ -390,9 +322,9 @@ namespace SudokuSolver
             return true;
         }
 
-        public void Backtracking()
+        public int Backtracking()
         {
-            int result = RecursiveBacktracking();
+            return RecursiveBacktracking();
         }
 
         public int RecursiveBacktracking()
@@ -402,11 +334,11 @@ namespace SudokuSolver
             Dictionary<string, List<int>> oldDomains = CopyDomains(domains);
 
             //string var = SelectUnassignedVariable();
-            //string var = MRV();
-            string var = DegreeHeuristic();
+            string var = MRV();
+            //string var = DegreeHeuristic();
 
-            List<int> values = new List<int>(domains[var]);
-            //List<int> values = LCV(var);
+            //List<int> values = new List<int>(domains[var]);
+            List<int> values = LCV(var);
 
             foreach (int value in values)
             {
@@ -417,7 +349,7 @@ namespace SudokuSolver
                     int i = coordIj[0];
                     int j = coordIj[1];
 
-                    gridSolution[i, j] = value;
+                    grid[i, j] = value;
 
                     List<int> domain = new List<int>(domains[var]);
 
@@ -433,7 +365,7 @@ namespace SudokuSolver
 
                     string printGridConf = ConfigurationManager.AppSettings.Get("PrintGrid");
                     if (printGridConf == "true")
-                        PrintGrid();
+                        //PrintGridEvolution();
 
                     //Console.WriteLine("var:{0} | value:{1}", var, value);
 
@@ -445,7 +377,7 @@ namespace SudokuSolver
 
                     if (result == 0) { return result; }
 
-                    gridSolution[i, j] = 0;
+                    grid[i, j] = 0;
 
                     domains = CopyDomains(oldDomains);
 
@@ -456,62 +388,18 @@ namespace SudokuSolver
             return 1;
         }
 
-        public void PrintGrid()
+        public void PrintGridEvolution()
         {
             Console.SetCursorPosition(0, 0);
 
-            for(int i=0; i<gridSize; i++)
-            {
-                if (i % Math.Sqrt(gridSize) == 0 && i != 0)
-                {
-                    for (int k = 0; k < gridSize + 2; k++)
-                    {
-                        Console.Write('-');
-                    }
-
-                    Console.WriteLine();
-                }
-
-                for (int j=0; j < gridSize; j++)
-                {
-                    if (j % Math.Sqrt(gridSize) == 0 && j!=0)
-                    {
-                        Console.Write('|');
-                    }
-
-                    if (gridSolution[i,j] > 0)
-                    {
-                        Console.Write(gridSolution[i, j]);
-                    }
-                    else
-                    {
-                        Console.Write(' ');
-                    }
-                }
-
-                Console.WriteLine();
-
-            }
+            PrintGrid();
 
             Console.WriteLine();
             Console.WriteLine("Num of steps : {0}", nbStep);
+
+            //Thread.Sleep(100);
         }
 
-        public string IjToCoord(int i, int j)
-        {
-            char[] coord = { (char)(i + 'A'), (char)(j + '0') };
-
-            return new string(coord);
-        }
-
-        public List<int> CoordToIj(string coord)
-        {
-            List<int> ij = new List<int>();
-            
-            ij.Add(coord[0] - 'A');
-            ij.Add(coord[1] - '0');
-
-            return ij;
-        }
+       
     }
 }
