@@ -24,7 +24,9 @@ namespace SudokuSolver
 
             GenerateDomains();
 
-            AC3();
+            string ac3Conf = ConfigurationManager.AppSettings.Get("AC3");
+            if (ac3Conf == "true")
+                AC3();
 
             int res = Backtracking();
 
@@ -332,13 +334,38 @@ namespace SudokuSolver
             if(AssigmentComplete() == true) { return 0; }
 
             Dictionary<string, List<int>> oldDomains = CopyDomains(domains);
+            string var = null;
+            List<int> values = null;
 
-            //string var = SelectUnassignedVariable();
-            string var = MRV();
-            //string var = DegreeHeuristic();
+            string unassignedVariableConf = ConfigurationManager.AppSettings.Get("UnassignedVariable");
+            if (unassignedVariableConf == "true")
+            {
+                var = SelectUnassignedVariable();
+            }
 
-            //List<int> values = new List<int>(domains[var]);
-            List<int> values = LCV(var);
+            string MRVConf = ConfigurationManager.AppSettings.Get("MRV");
+            if (MRVConf == "true")
+            {
+                var = MRV();
+            }
+
+            string degreeHeuristicConf = ConfigurationManager.AppSettings.Get("DH");
+            if (degreeHeuristicConf == "true")
+            {
+                var = DegreeHeuristic();
+            }
+
+            string lcvConf = ConfigurationManager.AppSettings.Get("LCV");
+            if (lcvConf == "true")
+            {
+                values = LCV(var);
+            }
+            else
+            {
+                values = new List<int>(domains[var]);
+            }
+            
+            string ac3Conf = ConfigurationManager.AppSettings.Get("AC3");
 
             foreach (int value in values)
             {
@@ -361,7 +388,8 @@ namespace SudokuSolver
                         }
                     }
 
-                    AC3();
+                    if (ac3Conf == "true")
+                        AC3();
 
                     string printGridConf = ConfigurationManager.AppSettings.Get("PrintGrid");
                     if (printGridConf == "true")
@@ -377,7 +405,8 @@ namespace SudokuSolver
 
                     domains = CopyDomains(oldDomains);
 
-                    AC3();
+                    if (ac3Conf == "true")
+                        AC3();
                 }
             }
 
