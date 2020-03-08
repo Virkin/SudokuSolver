@@ -365,11 +365,7 @@ namespace SudokuSolver
 
                     string printGridConf = ConfigurationManager.AppSettings.Get("PrintGrid");
                     if (printGridConf == "true")
-                        //PrintGridEvolution();
-
-                    //Console.WriteLine("var:{0} | value:{1}", var, value);
-
-                    //Thread.Sleep(20000);
+                        PrintGridEvolution();
 
                     nbStep++;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-
+using System.IO;
 
 namespace SudokuSolver
 {
@@ -11,7 +11,7 @@ namespace SudokuSolver
        
         private Solver solver;
 
-        private int nbRemoveValues;
+        private int nbRemoveValues = 0;
         private int nbRemove = 0;
 
         private int[,] solveGrid;
@@ -23,14 +23,50 @@ namespace SudokuSolver
             solveGrid = grid.Clone() as int[,];
             //PrintGrid();
 
-            nbRemoveValues = 81;
+            string generateConf = ConfigurationManager.AppSettings.Get("Generate");
+            if (generateConf == "easy")
+                nbRemoveValues = 81-45;
+            else if (generateConf == "medium")
+                nbRemoveValues = 81-35;
+            else if (generateConf == "hard")
+                nbRemoveValues = 81-25;
 
+            Console.WriteLine("Generating sudoku ({0}) ...", generateConf);
             while (nbRemove < nbRemoveValues)
             {
                 removeRandomValue();
             }
 
             PrintGeneratedGrid();
+            writeSudokuToFile();
+        }
+
+        public void writeSudokuToFile()
+        {
+            string time = DateTime.Now.ToString("yyyyMMdd_HHmmss"); 
+            string generateConf = ConfigurationManager.AppSettings.Get("Generate");
+            string workingDirectory = Environment.CurrentDirectory;
+            string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
+            string path = projectDirectory+"\\Sudoku"+time+generateConf+".txt";
+
+            List<string> lines = new List<string>();
+            string line = "";
+            int nbLine = 0;
+
+            foreach (int number in grid)
+            {
+                if (nbLine == gridSize)
+                {
+                    lines.Add(line);
+                    line = "";
+                    nbLine = 0;
+                }
+                line+=number;
+                nbLine++;
+            }
+            lines.Add(line);
+
+            File.WriteAllLines(path, lines.ToArray());
         }
 
         public void removeRandomValue()
@@ -50,7 +86,7 @@ namespace SudokuSolver
 
                 int res = solver.Run();
 
-                Console.WriteLine("res : {0}", res);
+                //Console.WriteLine("res : {0}", res);
                 
                 if (res==0 && CompareSolveGrid(solver.GetGrid()))
                 {
@@ -83,7 +119,7 @@ namespace SudokuSolver
                 //Console.WriteLine();
            }
 
-           Console.WriteLine();
+           //Console.WriteLine();
             
            return true;
         }

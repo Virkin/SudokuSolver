@@ -7,6 +7,7 @@ namespace SudokuSolver
     class Reader
     {
         private List<string> listSudokuPath = new List<string>();
+        private List<string> listSudokuName = new List<string>();
         private List<int[,]> listSudoku2d = new List<int[,]>();
 
         public Reader()
@@ -14,7 +15,7 @@ namespace SudokuSolver
             ListSudoku();
         }
 
-        public List<string> ListSudoku()
+        public void ListSudoku()
         {
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
@@ -22,13 +23,18 @@ namespace SudokuSolver
             foreach (string filePath in fileEntries)
             {
                 listSudokuPath.Add(filePath);
+                listSudokuName.Add(Path.GetFileName(filePath));
             }
-            return listSudokuPath;
         }
 
         public List<string> getListSudokuPath()
         {
             return listSudokuPath;
+        }
+
+        public List<string> getListSudokuName()
+        {
+            return listSudokuName;
         }
 
         public string getSudokuPath(string path)
