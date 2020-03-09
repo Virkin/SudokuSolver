@@ -337,22 +337,19 @@ namespace SudokuSolver
             string var = null;
             List<int> values = null;
 
-            string unassignedVariableConf = ConfigurationManager.AppSettings.Get("UnassignedVariable");
-            if (unassignedVariableConf == "true")
-            {
-                var = SelectUnassignedVariable();
-            }
+            string varChoose = ConfigurationManager.AppSettings.Get("VarChoose");
 
-            string MRVConf = ConfigurationManager.AppSettings.Get("MRV");
-            if (MRVConf == "true")
+            if (varChoose == "MRV")
             {
                 var = MRV();
             }
-
-            string degreeHeuristicConf = ConfigurationManager.AppSettings.Get("DH");
-            if (degreeHeuristicConf == "true")
+            else if (varChoose == "DH")
             {
                 var = DegreeHeuristic();
+            }
+            else
+            {
+                var = SelectUnassignedVariable();
             }
 
             string lcvConf = ConfigurationManager.AppSettings.Get("LCV");
