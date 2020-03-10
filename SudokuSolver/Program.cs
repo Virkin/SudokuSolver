@@ -12,26 +12,28 @@ namespace SudokuSolver
     {
         static void Main(string[] args)
         {
+            string pathSudokuFolder = Environment.CurrentDirectory + "/Sudoku/";
+
+            DirectoryInfo di = new DirectoryInfo(pathSudokuFolder);
+
+            if (!di.Exists)
+            {
+                di.Create();
+            }
+
             Solver solver;
+            Reader reader = new Reader();
 
             string question;
             List<string> menu;
             int selected;
             int selectedSudoku;
             int[,] sudoku;
-
-            string pathSudokuFolder = Environment.CurrentDirectory + "/Sudoku/";
-
-            DirectoryInfo di  = new DirectoryInfo(pathSudokuFolder);
-
-            if (!di.Exists)
-            { 
-                di.Create();
-            }
             
             while (true)
             {
-                Reader reader = new Reader();
+                reader.ListSudoku();
+                
                 reader.Read();
 
                 question = "What would you like to do ?";
@@ -262,7 +264,20 @@ namespace SudokuSolver
                             string ext = filename.Split('.')[1] ;
                             if (ext == "txt")
                             {
-                                File.Copy(path, pathSudokuFolder + filename);
+                                try 
+                                {
+                                    int [,] mySudoku = reader.FileToArray(path);
+                                    File.Copy(path, pathSudokuFolder + filename);
+                                } 
+                                catch
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("Wrong sudoku grid format ! Please check if it's the same format at the example");
+                                    Console.ResetColor();
+                                    Console.WriteLine("Press any key to continue");
+                                    Console.ReadKey();
+                                    break;
+                                }
                             }
                             else
                             {
@@ -271,6 +286,7 @@ namespace SudokuSolver
                                 Console.ResetColor();
                                 Console.WriteLine("Press any key to continue");
                                 Console.ReadKey();
+                                break;
                             }
                         }
                         else
