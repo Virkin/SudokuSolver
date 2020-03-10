@@ -12,8 +12,10 @@ namespace SudokuSolver
 {
     class Solver : Sudoku
     {
+        // Save all possible values for each box of the grid
         private Dictionary<string, List<int>> domains;
 
+        // Number of step during the resolution
         private int nbStep = 0;
 
         public Solver(int[,] newGrid) : base(newGrid){}
@@ -22,19 +24,21 @@ namespace SudokuSolver
         {
             domains = new Dictionary<string, List<int>>();
 
+            // Initialize all possible domains
             GenerateDomains();
 
+            // Use AC3 to reduce domains size
             string ac3Conf = ConfigurationManager.AppSettings.Get("AC3");
             if (ac3Conf == "true")
                 AC3();
 
+            // Start the backtracking algorithm
             int res = Backtracking();
-
-            //PrintGridEvolution();
 
             return res;
         }
 
+        // Checks if the grid is solve
         public bool AssigmentComplete()
         {
             for(int i=0; i<gridSize; i++)
@@ -51,6 +55,7 @@ namespace SudokuSolver
             return true;
         }
 
+        // Return the first unassigned variable found
         public string SelectUnassignedVariable()
         {
             for (int i = 0; i < gridSize; i++)
@@ -67,6 +72,7 @@ namespace SudokuSolver
             return null;
         }
 
+        // Generate domains
         public void GenerateDomains()
         {
             for (int i = 0; i < gridSize; i++)
@@ -85,6 +91,7 @@ namespace SudokuSolver
             }
         }
 
+        // Checks if constraints are respected
         public bool CheckConstraints(string var, int val)
         {
             List<string> constrainElem = constraints[var];
@@ -102,6 +109,8 @@ namespace SudokuSolver
             return true;
         }
 
+        // MRV algorithm
+        // Choose the box which got the fewest possible values
         public string MRV()
         {
             int minValues = gridSize+1;
@@ -146,6 +155,7 @@ namespace SudokuSolver
             return IjToCoord(vari, varj);
         }
 
+        // Retrun all possible values for a box
         public List<int> GetPossibleValues(string var)
         {
             List<int> possibleValues = new List<int>();
@@ -161,6 +171,8 @@ namespace SudokuSolver
             return possibleValues;
         }
 
+        // LCV algorithm (Least Constraining Value)
+        // Choose the value with the smallest impact for other variables
         public List<int> LCV(string var)
         {
             List<int> varValues = new List<int>(domains[var]);
@@ -204,6 +216,7 @@ namespace SudokuSolver
             return orderedValues;
         }
 
+        // Degree heuristic algorithm
         public string DegreeHeuristic()
         {
             int nbConstraints;
@@ -246,6 +259,7 @@ namespace SudokuSolver
             return IjToCoord(vari, varj);
         }
 
+        // Create a copy of the actual domain
         public Dictionary<string, List<int>> CopyDomains(Dictionary<string, List<int>> oldDomains)
         {
             Dictionary<string, List<int>> newDomains = new Dictionary<string, List<int>>();
@@ -276,6 +290,7 @@ namespace SudokuSolver
             return arcs;
         }
 
+        //AC3 algorithm
         public void AC3()
         {
             Queue<(string, string)> arcsQueue = GenerateArcs();
@@ -324,6 +339,7 @@ namespace SudokuSolver
             return true;
         }
 
+        // Recursive backtracking algorithm
         public int Backtracking()
         {
             return RecursiveBacktracking();
@@ -410,6 +426,7 @@ namespace SudokuSolver
             return 1;
         }
 
+        // Print the evolution of the resolution
         public void PrintGridEvolution()
         {
             Console.SetCursorPosition(0, 0);
@@ -418,10 +435,6 @@ namespace SudokuSolver
 
             Console.WriteLine();
             Console.WriteLine("Num of steps : {0}", nbStep);
-
-            //Thread.Sleep(100);
-        }
-
-       
+        }       
     }
 }

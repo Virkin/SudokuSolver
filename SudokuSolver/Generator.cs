@@ -18,6 +18,10 @@ namespace SudokuSolver
 
         private string sudokuName;
 
+        // To generate a random grid, we solve an empty grid with the solver to get a random solution
+        // Then, we remove a certain number of value (depending of the difficulty)
+        // Each time we remove a variable, we test if the new grid still got one unique solution 
+
         public Generator(string name) : base()
         {
             sudokuName = name;

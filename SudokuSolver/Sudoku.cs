@@ -27,6 +27,7 @@ namespace SudokuSolver
             Init();
         }
 
+        // Initialisation of a sudoku grid
         public void Init()
         {
             gridSize = (int)Math.Sqrt(grid.Length);
@@ -48,6 +49,7 @@ namespace SudokuSolver
             Init();
         }
 
+        // Genrate constraints for a sukodu problem
         public void GenerateConstraints()
         {
             for (int i = 0; i < gridSize; i++)
@@ -90,6 +92,7 @@ namespace SudokuSolver
             }
         }
 
+        // Convert i,j to alphanumeric coordinatse (ex: 0,0 -> A0) 
         public string IjToCoord(int i, int j)
         {
             char[] coord = { (char)(i + 'A'), (char)(j + '0') };
@@ -97,6 +100,7 @@ namespace SudokuSolver
             return new string(coord);
         }
 
+        // Convert alphanumeric to i,j coordinatse (ex: A0 -> 0,0) 
         public List<int> CoordToIj(string coord)
         {
             List<int> ij = new List<int>();
@@ -107,6 +111,7 @@ namespace SudokuSolver
             return ij;
         }
 
+        // Print the grid
         public void PrintGrid()
         {
             for (int i = 0; i < gridSize; i++)
@@ -145,6 +150,7 @@ namespace SudokuSolver
             Console.WriteLine();
         }
 
+        // Return the grid
         public int [,] GetGrid()
         {
             return grid;
