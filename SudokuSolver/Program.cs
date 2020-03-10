@@ -43,6 +43,11 @@ namespace SudokuSolver
                 {
                     case 0:
 
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("--< Solver >--");
+                        Console.WriteLine();
+                        Console.ResetColor();
+
                         menu = reader.getListSudokuName();
 
                         if(menu.Count == 0)
@@ -122,14 +127,27 @@ namespace SudokuSolver
                         }
 
                         string name = reader.getListSudokuName()[selectedSudoku];
-                        
+
+                        solver = new Solver(sudoku);
+
+                        solver.PrintGrid();
+
+                        question = "Do you want to start the solver for this grid and with parameters configure just before?";
+                        menu = new List<string>(new string[] { "Yes", "No" });
+
+                        selected = GenerateMenu(question, menu);
+
+                        if (selected == 1)
+                        {
+                            break;
+                        }
+
                         Console.Clear();
 
                         Console.WriteLine("\t\tSolving sudoku : {0}", name);
                         Stopwatch stopwatch = new Stopwatch();
                         stopwatch.Start();
 
-                        solver = new Solver(sudoku);
                         int res = solver.Run();
 
                         Console.WriteLine();
@@ -145,6 +163,9 @@ namespace SudokuSolver
 
                         stopwatch.Stop();
                         TimeSpan elapsed_time = stopwatch.Elapsed;
+
+                        solver.PrintGridEvolution();
+
                         Console.WriteLine("Time to solve (hh:mm:ss) : {0}", elapsed_time);
                         Console.WriteLine("Press any key to continue");
                         Console.ReadKey();
@@ -152,6 +173,11 @@ namespace SudokuSolver
                         break;
                     
                     case 1:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("--< Generator >--");
+                        Console.WriteLine();
+                        Console.ResetColor();
+
                         question = "Do you want to display the resolution animation ?";
                         menu = new List<string>(new string[] { "Yes", "No" });
 
@@ -198,12 +224,20 @@ namespace SudokuSolver
                         break;
 
                     case 2:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("--< Import >--");
                         Console.WriteLine();
+                        Console.ResetColor();
+
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
 
                         Console.WriteLine("To import a sudoku, please indicate the path of the file");
                         Console.WriteLine("The grid has to be a matrix of 9x9 size which values correspond to the number of the sudoku and empty box are equals to 0");
                         Console.WriteLine("The file has to be in .txt format");
                         Console.WriteLine();
+
+                        Console.ResetColor();
+
                         Console.WriteLine("Example :");
                         Console.WriteLine(  "040000179\n" +
                                             "002008054\n" +
@@ -217,7 +251,9 @@ namespace SudokuSolver
 
                         Console.WriteLine();
 
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write("Path : ");
+                        Console.ResetColor();
                         string path = Console.ReadLine();
 
                         if(File.Exists(path))
@@ -250,6 +286,11 @@ namespace SudokuSolver
                         break;
 
                     case 3:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("--< Remove >--");
+                        Console.WriteLine();
+                        Console.ResetColor();
+
                         menu = reader.getListSudokuName();
 
                         if (menu.Count == 0)
@@ -273,12 +314,17 @@ namespace SudokuSolver
                         break;
 
                     case 4:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.WriteLine("--< Quit >--");
+                        Console.WriteLine();
+                        Console.ResetColor();
+
                         question = "Do you want to clean the sudoku folder ?";
-                        menu = new List<string>(new string[] { "Yes", "No" });
+                        menu = new List<string>(new string[] { "No", "Yes" });
 
                         selected = GenerateMenu(question, menu);
 
-                        if (selected == 0)
+                        if (selected == 1)
                         {
                             di.Delete(true);
                         }

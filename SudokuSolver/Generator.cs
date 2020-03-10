@@ -35,7 +35,6 @@ namespace SudokuSolver
             solver.Run();
 
             solveGrid = grid.Clone() as int[,];
-            //PrintGrid();
 
             string generateConf = ConfigurationManager.AppSettings.Get("Generate");
             if (generateConf == "easy")
@@ -52,15 +51,14 @@ namespace SudokuSolver
             }
 
             PrintGeneratedGrid();
-            writeSudokuToFile();
+            WriteSudokuToFile();
         }
 
-        public void writeSudokuToFile()
+        public void WriteSudokuToFile()
         {
             string time = DateTime.Now.ToString("yyyyMMdd_HHmmss"); 
             string generateConf = ConfigurationManager.AppSettings.Get("Generate");
             string pathSudokuFolder = Environment.CurrentDirectory + "/Sudoku";
-            //string path = projectDirectory+"\\Sudoku"+time+generateConf+".txt";
             string path = pathSudokuFolder + "\\" + sudokuName + ".txt";
 
             List<string> lines = new List<string>();
@@ -90,7 +88,6 @@ namespace SudokuSolver
             int i = rnd.Next(gridSize);
             int j = rnd.Next(gridSize);
 
-            //Console.WriteLine("i:{0} ,j:{1} ,val:{2}", i, j, grid[i, j]);
             if(grid[i,j] > 0)
             {
                 int oldValue = grid[i, j];
@@ -101,8 +98,6 @@ namespace SudokuSolver
 
                 int res = solver.Run();
 
-                //Console.WriteLine("res : {0}", res);
-                
                 if (res==0 && CompareSolveGrid(solver.GetGrid()))
                 {
                     nbRemove++;
@@ -111,10 +106,6 @@ namespace SudokuSolver
 
                 grid[i, j] = oldValue;
             }
-            
-
-            //PrintGrid();
-            //Console.ReadKey();
         }
 
         public bool CompareSolveGrid(int [,] compGrid)
@@ -123,19 +114,12 @@ namespace SudokuSolver
            {
                 for(int j=0; j<gridSize; j++)
                 {
-                    //Console.Write("{0}|{1} ", solveGrid[i,j], compGrid[i,j]);
-
                     if (solveGrid[i,j] != compGrid[i,j])
                     {
                         return false;
                     }
                 }
-
-                //Console.WriteLine();
            }
-
-           //Console.WriteLine();
-            
            return true;
         }
 
