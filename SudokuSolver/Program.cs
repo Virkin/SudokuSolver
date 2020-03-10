@@ -20,13 +20,22 @@ namespace SudokuSolver
             int selectedSudoku;
             int[,] sudoku;
 
+            string pathSudokuFolder = Environment.CurrentDirectory + "/Sudoku/";
+
+            DirectoryInfo di  = new DirectoryInfo(pathSudokuFolder);
+
+            if (!di.Exists)
+            { 
+                di.Create();
+            }
+            
             while (true)
             {
                 Reader reader = new Reader();
                 reader.Read();
 
                 question = "What would you like to do ?";
-                menu = new List<string>(new string[] { "Solve", "Generate", "Quit"});
+                menu = new List<string>(new string[] { "Solve", "Generate", "Import", "Quit"});
 
                 selected = GenerateMenu(question, menu);
 
@@ -179,6 +188,43 @@ namespace SudokuSolver
                         break;
 
                     case 2:
+                        Console.WriteLine();
+
+                        Console.WriteLine("To import a sudoku, please indicate the path of the file");
+                        Console.WriteLine("The grid has to be a matrix of 9x9 size which values correspond to the number of the sudoku and empty box are equals to 0");
+                        Console.WriteLine("The file has to be in .txt format");
+                        Console.WriteLine();
+                        Console.WriteLine("Example :");
+                        Console.WriteLine(  "040000179\n" +
+                                            "002008054\n" +
+                                            "006005008\n" +
+                                            "080070910\n" +
+                                            "050090030\n" +
+                                            "019060040\n" +
+                                            "300400700\n" +
+                                            "570100200\n" +
+                                            "928000060\n");
+
+                        Console.WriteLine();
+
+                        Console.Write("Path : ");
+                        string path = Console.ReadLine();
+
+                        File.Copy(path, pathSudokuFolder + Path.GetFileName(path));
+
+                        break;
+
+                    case 3:
+                        question = "Do you want to clean the sudoku folder ?";
+                        menu = new List<string>(new string[] { "Yes", "No" });
+
+                        selected = GenerateMenu(question, menu);
+
+                        if (selected == 0)
+                        {
+                            di.Delete(true);
+                        }
+                       
                         System.Environment.Exit(1);
                         break;
                 }

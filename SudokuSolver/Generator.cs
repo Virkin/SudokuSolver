@@ -21,7 +21,12 @@ namespace SudokuSolver
         public Generator(string name) : base()
         {
             sudokuName = name;
-            
+
+            Run();
+        }
+
+        public void Run()
+        {
             solver = new Solver(grid);
             solver.Run();
 
@@ -30,11 +35,11 @@ namespace SudokuSolver
 
             string generateConf = ConfigurationManager.AppSettings.Get("Generate");
             if (generateConf == "easy")
-                nbRemoveValues = 81-45;
+                nbRemoveValues = 81 - 45;
             else if (generateConf == "medium")
-                nbRemoveValues = 81-35;
+                nbRemoveValues = 81 - 35;
             else if (generateConf == "hard")
-                nbRemoveValues = 81-25;
+                nbRemoveValues = 81 - 25;
 
             Console.WriteLine("Generating sudoku ({0}) ...", generateConf);
             while (nbRemove < nbRemoveValues)
@@ -50,13 +55,13 @@ namespace SudokuSolver
         {
             string time = DateTime.Now.ToString("yyyyMMdd_HHmmss"); 
             string generateConf = ConfigurationManager.AppSettings.Get("Generate");
-            string workingDirectory = Environment.CurrentDirectory;
-            string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
+            string pathSudokuFolder = Environment.CurrentDirectory + "/Sudoku";
             //string path = projectDirectory+"\\Sudoku"+time+generateConf+".txt";
-            string path = projectDirectory + "\\" + sudokuName + ".txt";
+            string path = pathSudokuFolder + "\\" + sudokuName + ".txt";
 
             List<string> lines = new List<string>();
             string line = "";
+
             int nbLine = 0;
 
             foreach (int number in grid)

@@ -17,9 +17,8 @@ namespace SudokuSolver
 
         public void ListSudoku()
         {
-            string workingDirectory = Environment.CurrentDirectory;
-            string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
-            string[] fileEntries = Directory.GetFiles(projectDirectory, "*.txt");
+            string sudokuDirectory = Environment.CurrentDirectory + "/Sudoku";
+            string[] fileEntries = Directory.GetFiles(sudokuDirectory, "*.txt");
             
             foreach (string filePath in fileEntries)
             {
