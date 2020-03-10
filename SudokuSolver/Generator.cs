@@ -15,8 +15,13 @@ namespace SudokuSolver
         private int nbRemove = 0;
 
         private int[,] solveGrid;
-        public Generator() : base()
+
+        private string sudokuName;
+
+        public Generator(string name) : base()
         {
+            sudokuName = name;
+            
             solver = new Solver(grid);
             solver.Run();
 
@@ -47,7 +52,8 @@ namespace SudokuSolver
             string generateConf = ConfigurationManager.AppSettings.Get("Generate");
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
-            string path = projectDirectory+"\\Sudoku"+time+generateConf+".txt";
+            //string path = projectDirectory+"\\Sudoku"+time+generateConf+".txt";
+            string path = projectDirectory + "\\" + sudokuName + ".txt";
 
             List<string> lines = new List<string>();
             string line = "";
@@ -126,6 +132,7 @@ namespace SudokuSolver
 
         public void PrintGeneratedGrid()
         {
+            Console.Clear();
             PrintGrid();
         }
     }

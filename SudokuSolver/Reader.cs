@@ -20,6 +20,7 @@ namespace SudokuSolver
             string workingDirectory = Environment.CurrentDirectory;
             string projectDirectory = Directory.GetParent(workingDirectory).Parent.FullName;
             string[] fileEntries = Directory.GetFiles(projectDirectory, "*.txt");
+            
             foreach (string filePath in fileEntries)
             {
                 listSudokuPath.Add(filePath);

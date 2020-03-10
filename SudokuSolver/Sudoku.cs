@@ -35,8 +35,7 @@ namespace SudokuSolver
 
             for (int i = 1; i <= gridSize; i++) { valuesEnum.Add(i); }
 
-            Random rnd = new Random();
-            valuesEnum = valuesEnum.OrderBy(a => rnd.Next()).ToList();
+            valuesEnum = valuesEnum.OrderBy(x => Guid.NewGuid()).ToList();
 
             constraints = new Dictionary<string, List<string>>();
 
