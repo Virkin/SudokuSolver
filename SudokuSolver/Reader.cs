@@ -52,7 +52,7 @@ namespace SudokuSolver
             foreach (string path in listSudokuPath)
             {
                 int size = getSize(path);
-                // create a sudo matrix to store the sudoku
+                // create a sudoku matrix to store the sudoku
                 int[,] sudoku2d = new int[size, size];
                 // read each line of the sudoku in the file
                 string[] lines = File.ReadAllLines(path);
