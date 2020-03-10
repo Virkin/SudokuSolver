@@ -35,7 +35,7 @@ namespace SudokuSolver
                 reader.Read();
 
                 question = "What would you like to do ?";
-                menu = new List<string>(new string[] { "Solve", "Generate", "Import", "Quit"});
+                menu = new List<string>(new string[] { "Solve", "Generate", "Import", "Remove", "Quit"});
 
                 selected = GenerateMenu(question, menu);
 
@@ -43,8 +43,19 @@ namespace SudokuSolver
                 {
                     case 0:
 
-                        question = "Which sudoku do you want to solve ?";
                         menu = reader.getListSudokuName();
+
+                        if(menu.Count == 0)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("The sudoku folder is empty ! Please generate or import one grid.");
+                            Console.ResetColor();
+                            Console.WriteLine("Press any key to continue");
+                            Console.ReadKey();
+                            break;
+                        }
+
+                        question = "Which sudoku do you want to solve ?";
 
                         selectedSudoku = GenerateMenu(question, menu);
 
@@ -173,7 +184,6 @@ namespace SudokuSolver
                             ConfigurationManager.AppSettings.Set("Generate", "hard");
                         }
 
-                        Console.WriteLine();
                         Console.Write("Choose a name for the sudoku : ");
                         string sudokuName = Console.ReadLine();
 
@@ -210,11 +220,59 @@ namespace SudokuSolver
                         Console.Write("Path : ");
                         string path = Console.ReadLine();
 
-                        File.Copy(path, pathSudokuFolder + Path.GetFileName(path));
+                        if(File.Exists(path))
+                        {
+                            string filename = Path.GetFileName(path);
+                            string ext = filename.Split('.')[1] ;
+                            if (ext == "txt")
+                            {
+                                File.Copy(path, pathSudokuFolder + filename);
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Wrong file extension ! Please provide a .txt file");
+                                Console.ResetColor();
+                                Console.WriteLine("Press any key to continue");
+                                Console.ReadKey();
+                            }
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("The path is Wrong ! Couldn't find the file");
+                            Console.ResetColor();
+                            Console.WriteLine("Press any key to continue");
+                            Console.ReadKey();
+                            break;
+                        }
 
                         break;
 
                     case 3:
+                        menu = reader.getListSudokuName();
+
+                        if (menu.Count == 0)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("The sudoku folder is empty !");
+                            Console.ResetColor();
+                            Console.WriteLine("Press any key to continue");
+                            Console.ReadKey();
+                            break;
+                        }
+
+                        question = "Which sudoku do you want to remove ?";
+
+                        selectedSudoku = GenerateMenu(question, menu);
+
+                        string gridRemoveName = reader.getListSudokuName()[selectedSudoku];
+
+                        File.Delete(pathSudokuFolder + gridRemoveName);
+
+                        break;
+
+                    case 4:
                         question = "Do you want to clean the sudoku folder ?";
                         menu = new List<string>(new string[] { "Yes", "No" });
 
@@ -241,7 +299,6 @@ namespace SudokuSolver
 
             bool done = false;
 
-            Console.WriteLine();
             Console.WriteLine(question);
 
             while (!done)
@@ -279,6 +336,8 @@ namespace SudokuSolver
                 if (!done)
                     Console.CursorTop = Console.CursorTop - optionsCount;
             }
+
+            Console.WriteLine();
 
             return selected;
         }
